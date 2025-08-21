@@ -5,7 +5,7 @@ Phase 1 focuses on **data foundations** — making raw data queryable, exploring
 
 ---
 
-## 📊 Project Overview
+## Project Overview
 
 ### Project 1: SQL Analytics
 Using the **Lahman Baseball Database (1871–2023)**, I explored trends and insights in batting, pitching, and team performance.  
@@ -31,7 +31,7 @@ Before any AI/ML work, **trust starts with data quality**. I designed validation
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **SQL** (Athena, PostgreSQL, SQLite): Data exploration, joins, aggregations  
 - **AWS S3**: Storage for CSV datasets  
@@ -42,7 +42,7 @@ Before any AI/ML work, **trust starts with data quality**. I designed validation
 
 ---
 
-## 🎯 Strategic Alignment with Governance Roadmap
+## Strategic Alignment with Governance Roadmap
 
 This phase maps to my **strategic goals for AI Governance**:
 
@@ -66,8 +66,5 @@ This phase maps to my **strategic goals for AI Governance**:
    - **AWS-native path** (Athena, Glue, S3, Tableau Desktop)  
    - **Public path** (Python, CSVs, Tableau Public for sharing dashboards)  
 
----
-
-## 📂 Repository Structure
 
 
