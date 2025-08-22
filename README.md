@@ -2,11 +2,13 @@
 
 ## Overview
 
-This portfolio demonstrates my ability to design and deliver **end-to-end Data & AI systems** with a strong emphasis on **governance, trust, and business value**.  
+This portfolio is to show the importance of **end-to-end Data & AI systems** with a strong emphasis on **governance, trust, and business value**.  
 It is structured into **five phases**, each building on the previous one — starting from SQL exploration and progressing toward advanced AI governance.  
 
 The work is based primarily on the **Lahman Baseball Database** (historical player, team, and salary data) and extended with synthetic/alternative datasets where needed.  
 While the examples use sports data, the principles apply to **healthcare, finance, and other regulated industries** where trust and compliance are critical. 
+
+The data set is small and all data is publicly available.
 
 ## Purpose
 
@@ -26,7 +28,7 @@ The goal of this roadmap is to:
 3. **Security & Privacy by Design** – Protect sensitive data (de-identification, IAM, encryption) while keeping it useful.
 4. **MLOps & LLMOps Discipline** – Training is not enough; you must deploy, monitor, and continuously check for drift, bias, and compliance.
 5. **Trust as a Product Feature** – Governance isn’t “red tape.” When done right, it accelerates adoption, builds customer confidence, and creates competitive advantage.
-6. **Enterprise + Public Perspective** – Demonstrating primarily **AWS-native workflows** (Athena, Glue, SageMaker, Lake Formation, IAM) while also including **open alternatives** (Colab, GitHub, lightweight libraries) shows versatility — prototyping fast while respecting enterprise rigor.
+6. **Enterprise + Public Perspective** – Demonstrating primarily **AWS-native workflows** (Athena, Glue, SageMaker, Lake Formation, IAM) while also including **open alternatives** (Colab, JupyterLab, GitHub, lightweight libraries) shows versatility — prototyping fast while respecting enterprise rigor.
 
 ---
 
@@ -97,9 +99,8 @@ The goal of this roadmap is to:
 
 ---
 
-## How This Portfolio Aligns With My Strategic Goals
-
-This body of work demonstrates more than technical proficiency — it shows my ability to:  
+## Portfolio Strategic Goals
+ 
 - **Bridge product and engineering**: translating business problems into technical solutions.  
 - **Design for trust and compliance**: embedding privacy, fairness, and observability into AI systems.  
 - **Think strategically**: building reusable frameworks and playbooks for organizations adopting AI.  
