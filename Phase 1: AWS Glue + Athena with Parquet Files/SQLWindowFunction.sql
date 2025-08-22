@@ -1,3 +1,9 @@
+/*
+A window function is important because it allows you to perform calculations across a set of rows that are related to the current row, 
+without collapsing the result into a single summary row. 
+In other words, unlike GROUP BY, window functions preserve the row-level detail while still enabling aggregate-like operations. 
+This is critical in analytics because you often want both individual row data and contextual calculations at the same time.
+*/
 WITH ranked_homers AS (
     SELECT 
         p.nameFirst,
