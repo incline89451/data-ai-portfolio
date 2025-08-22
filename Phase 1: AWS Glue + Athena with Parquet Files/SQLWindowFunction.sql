@@ -21,3 +21,4 @@ WITH ranked_homers AS (
 SELECT *
 FROM ranked_homers
 WHERE hr_rank <= 5;
+
