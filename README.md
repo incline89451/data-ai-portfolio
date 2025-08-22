@@ -1,14 +1,12 @@
-# data_ai_governance
+# AI Governance & Data Engineering Portfolio
 
-# Data & AI Governance Roadmap
+## Overview
 
-Welcome to my **10-Project Roadmap on Data & AI Governance**.
+This portfolio demonstrates my ability to design and deliver **end-to-end Data & AI systems** with a strong emphasis on **governance, trust, and business value**.  
+It is structured into **five phases**, each building on the previous one — starting from SQL exploration and progressing toward advanced AI governance.  
 
-This repository is not just about technical demos — it’s a narrative. The goal of this roadmap to demonstrate that **governance, trust, and compliance** are not side concerns in AI — they are the foundation for value creation.
-
-As a **Senior Product Executive**, my focus is on strategy, architecture, and product outcomes. I love the technical side of things but I would not describe myself as a programer.  This work demonstrates **product-led thinking**: connecting hands-on experiments with enterprise-scale governance challenges.
-
----
+The work is based primarily on the **Lahman Baseball Database** (historical player, team, and salary data) and extended with synthetic/alternative datasets where needed.  
+While the examples use sports data, the principles apply to **healthcare, finance, and other regulated industries** where trust and compliance are critical. 
 
 ## Purpose
 
@@ -32,16 +30,6 @@ The goal of this roadmap is to:
 
 ---
 
-## Structure of This Repository
-
-Each project has its own folder with:
-
-* **README**: Plain-language explanation of the project, why it matters for governance, and how it connects to the bigger roadmap.
-* **Code / Notebooks**: Where applicable, lightweight implementations in **Python** (for data prep, pipelines, analysis, or ML).
-* **Governance Notes**: A “so what” section translating the technical exercise into governance, compliance, and trust implications.
-
----
-
 ## Who This Is For
 
 * **Product Leaders** – See how governance can become a competitive advantage.
@@ -51,20 +39,75 @@ Each project has its own folder with:
 
 ---
 
-## Roadmap Themes
+## Phases & Projects
 
-* **Data Engineering Foundations** (cleaning, cataloging, formats)
-* **Security & Privacy** (IAM, de-identification, encryption)
-* **MLOps + LLMOps** (drift monitoring, bias checks, auditability)
-* **Trust & Governance** (lineage, observability, compliance frameworks)
-* **Enterprise vs. Public Workflows** (AWS-first with selected open alternatives)
-* **Python for Implementation** (data prep, observability, AI demos where appropriate)
+### **Phase 1: SQL & Data Exploration**
+- **Goal:** Explore large relational datasets, generate insights, and build SQL proficiency.  
+- **Projects:**  
+  - SQL analytics on player stats, salaries, and team trends.  
+  - Visualization of historical baseball performance using Athena/SQLite.  
+- **Skills:** Data manipulation, joins, window functions, business insight generation.  
 
 ---
 
-## Closing Thought
+### **Phase 2: Python Data Engineering**
+- **Goal:** Build reproducible pipelines and demonstrate privacy-aware engineering.  
+- **Projects:**  
+  - ETL pipeline from raw CSV → cleaned database (SQLite/Postgres).  
+  - PII detection & masking with audit logs.  
+- **Skills:** ETL design, reproducibility, privacy, risk mitigation.  
 
-> **Governance is not bureaucracy.** It’s the fastest way to scale AI responsibly.
-> This roadmap proves that **trust is a product feature** — and the organizations who get it right will win.
+---
+
+### **Phase 3: Machine Learning**
+- **Goal:** Apply predictive modeling and ensure explainability and fairness.  
+- **Projects:**  
+  - Predictive ML model (e.g., player performance trends).  
+  - Explainability (SHAP/LIME) + bias analysis.  
+- **Skills:** ML modeling, feature engineering, interpretability, fairness.  
+
+---
+
+### **Phase 4: LLM / RAG Systems**
+- **Goal:** Build retrieval-augmented generation (RAG) systems and monitor LLMs in production.  
+- **Projects:**  
+  - RAG chatbot with source attribution (baseball rules/FAQs).  
+  - LLM observability dashboard for query accuracy, latency, hallucinations.  
+- **Skills:** LLM integration, RAG pipelines, observability, trust in AI.  
+
+---
+
+### **Phase 5: AI Governance & Compliance**
+- **Goal:** Demonstrate risk mitigation and operational governance in AI.  
+- **Projects:**  
+  - Model drift detection & alerts.  
+  - AI governance playbook (incident response aligned with HIPAA/GDPR principles).  
+- **Skills:** Governance, compliance, operational readiness, responsible AI.  
+
+---
+
+## Technologies Used
+
+- **Languages & Tools:** Python, SQL, Pandas, scikit-learn, SHAP/LIME, Streamlit, Plotly  
+- **Databases:** Postgres, AWS Athena  
+- **Data Engineering:** AWS Glue, Parquet, SQLAlchemy, logging  
+- **LLM & RAG:** OpenAI API, LangChain, FAISS/Chroma for retrieval  
+- **Governance & Trust:** PII masking, drift detection, bias analysis, audit logging  
+- **Visualization:** Power BI, Streamlit, Matplotlib  
+
+---
+
+## How This Portfolio Aligns With My Strategic Goals
+
+This body of work demonstrates more than technical proficiency — it shows my ability to:  
+- **Bridge product and engineering**: translating business problems into technical solutions.  
+- **Design for trust and compliance**: embedding privacy, fairness, and observability into AI systems.  
+- **Think strategically**: building reusable frameworks and playbooks for organizations adopting AI.  
+- **Communicate clearly**: through READMEs, blog posts, and visualizations that make complex work accessible.  
+
+---
+
+
+
 
 
