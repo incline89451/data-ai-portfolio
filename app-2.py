@@ -20,6 +20,10 @@ df = load_data()
 
 st.title("⚾ Lahman Baseball Simple Prediction")
 st.write("Using **People.parquet** with scikit-learn + Streamlit")
+st.write("This is a simple program that uses a Random Forest Classifier model")
+st.write("**Algorithm**: Random Forest - multiple decision trees")
+st.write("**Task Type**: Classification - predicting categorical outcomes")
+st.write("**Implementation**: Uses scikit-learn RandomForestClassifier")
 
 # -----------------------------
 # Simple Features & Target
