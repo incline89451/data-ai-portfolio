@@ -37,10 +37,10 @@ st.markdown("### Predict Future Hall of Famers using Machine Learning")
 def load_data():
     """Load local Parquet files"""
     try:
-        people_path = "/Users/todd/Desktop/csvdatabase/People/People.parquet"
-        batting_path = "/Users/todd/Desktop/csvdatabase/Batting/Batting.parquet"
-        pitching_path = "/Users/todd/Desktop/csvdatabase/Pitching/Pitching.parquet"
-        hof_path = "/Users/todd/Desktop/csvdatabase/HallOfFame/HallOfFame.parquet"
+        people_path = "People.parquet"
+        batting_path = "Batting.parquet"
+        pitching_path = "Pitching.parquet"
+        hof_path = "HallOfFame.parquet"
         
         people = pd.read_parquet(people_path)
         batting = pd.read_parquet(batting_path)
