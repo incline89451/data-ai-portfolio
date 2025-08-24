@@ -181,13 +181,12 @@ def task_team_divwin():
 # ----------------------------
 def main():
     st.title("Team Division Win Prediction (scikit-learn)")
-    st.caption("Loads Teams.parquet from ./data in your GitHub repo")
+    st.caption("Loads Teams.parquet from ./data in the GitHub repo")
     task_team_divwin()
 
     st.markdown("---")
     st.markdown("**Notes**")
     st.markdown("""
-    - Place Teams.parquet under `./data/` in your GitHub repo (Streamlit Cloud clones the repo).
     - Target: `DivWin` (1 if team won division, else 0).
     - Features: numeric stats from Teams table excluding IDs and non-numeric columns.
     - All missing or infinite values are replaced with 0 for model training.
