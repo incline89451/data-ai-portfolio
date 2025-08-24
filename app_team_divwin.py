@@ -80,15 +80,35 @@ def task_team_divwin():
     model_choice = st.selectbox("Choose model", ["Gradient Boosting","Random Forest"])
     test_size = st.slider("Test size", min_value=0.1, max_value=0.4, value=0.2, step=0.05)
 
-    # Clean features
-    X = df[feat_cols].copy()
-    X = X.apply(pd.to_numeric, errors="coerce")
-    X = X.replace([np.inf, -np.inf], np.nan)
-    X = X.fillna(0)
+    # Clean features and labels together to maintain alignment
+    X_df = df[feat_cols].copy()
+    y_series = df["label"].copy()
+    
+    # Apply cleaning to features
+    X_df = X_df.apply(pd.to_numeric, errors="coerce")
+    X_df = X_df.replace([np.inf, -np.inf], np.nan)
+    X_df = X_df.fillna(0)
+    
+    # Check for any rows that might have been problematic and remove them from both X and y
+    valid_rows = ~(X_df.isna().all(axis=1))  # Keep rows that aren't entirely NaN
+    X_clean = X_df[valid_rows]
+    y_clean = y_series[valid_rows]
+    
+    # Convert to numpy arrays
+    X = X_clean.values
+    y = y_clean.values.ravel()   # ensure y is strictly 1D
+    
+    # Add debugging info
+    st.write(f"Data shape: X={X.shape}, y={y.shape}")
+    st.write(f"Class distribution: {np.bincount(y)}")
 
-    y = df["label"].values.ravel()   # ensure y is strictly 1D
-    X = X.values
-
+    if len(X) != len(y):
+        st.error(f"Length mismatch: X has {len(X)} samples, y has {len(y)} samples")
+        return
+    
+    if len(np.unique(y)) < 2:
+        st.error("Need at least 2 classes for classification")
+        return
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42, stratify=y)
 
@@ -135,4 +155,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
