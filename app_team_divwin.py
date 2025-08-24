@@ -86,8 +86,8 @@ def task_team_divwin():
     X = X.replace([np.inf, -np.inf], np.nan)
     X = X.fillna(0)
 
-       y = df["label"].values.ravel()   # ensure y is strictly 1D
-       X = X.values
+    y = df["label"].values.ravel()   # ensure y is strictly 1D
+    X = X.values
 
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42, stratify=y)
