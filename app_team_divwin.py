@@ -57,7 +57,9 @@ def build_team_divwin_dataset():
 
     df["label"] = (df["DivWin"].astype(str) == "Y").astype(int)
 
-    exclude = {"DivWin","WCWin","LgWin","WSWin","name","park","teamIDBR","teamIDlahman45","teamIDretro","teamID","lgID","franchID","divID"}
+    exclude = {"DivWin","WCWin","LgWin","WSWin","name","park",
+               "teamIDBR","teamIDlahman45","teamIDretro",
+               "teamID","lgID","franchID","divID"}
     num_cols = [c for c in df.columns if c not in exclude and pd.api.types.is_numeric_dtype(df[c])]
     X = df[num_cols].copy()
     y = df["label"].copy()
@@ -78,8 +80,14 @@ def task_team_divwin():
     model_choice = st.selectbox("Choose model", ["Gradient Boosting","Random Forest"])
     test_size = st.slider("Test size", min_value=0.1, max_value=0.4, value=0.2, step=0.05)
 
-    X = df[feat_cols].values
+    # Clean features
+    X = df[feat_cols].copy()
+    X = X.apply(pd.to_numeric, errors="coerce")
+    X = X.replace([np.inf, -np.inf], np.nan)
+    X = X.fillna(0)
+
     y = df["label"].values
+    X = X.values
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42, stratify=y)
 
@@ -121,7 +129,9 @@ def main():
     - Place Teams.parquet under `./data/` in your GitHub repo (Streamlit Cloud clones the repo).
     - Target: `DivWin` (1 if team won division, else 0).
     - Features: numeric stats from Teams table excluding IDs and non-numeric columns.
+    - All missing or infinite values are replaced with 0 for model training.
     """)
 
 if __name__ == "__main__":
     main()
+
