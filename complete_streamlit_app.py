@@ -457,7 +457,7 @@ def main():
     with st.sidebar:
         st.markdown("## 📋 About This App")
         st.markdown("""
-        This app demonstrates **proper machine learning practices**:
+        This 2nd version demonstrates **proper machine learning practices**:
         
         ✅ **Data Cleaning**
         - Removes data leakage
@@ -469,10 +469,6 @@ def main():
         - Expects 70-85% accuracy (not 100%!)
         - Proper performance interpretation
         
-        ✅ **GitHub Ready**
-        - Clean, documented code
-        - Streamlit Cloud compatible
-        - Preserves original data
         """)
         
         st.markdown("## 📁 File Structure")
