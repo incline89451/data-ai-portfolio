@@ -114,9 +114,22 @@ def create_ultra_cleaned_dataset(save_to_disk=True):
         # We'll create our OWN features that simulate pre-season knowledge
     }
     
-    # Keep only allowed columns plus target
-    keep_cols = ['DivWin'] + [col for col in df.columns if col in allowed_features]
-    df = df[keep_cols]
+    # Keep only allowed columns plus target - SAFELY check what exists
+    keep_cols = ['DivWin']  # Always keep target
+    for col in df.columns:
+        if col in allowed_features:
+            keep_cols.append(col)
+    
+    # Safety check - make sure we have at least the target
+    if 'DivWin' not in df.columns:
+        st.error("❌ DivWin column not found in dataset!")
+        return pd.DataFrame(), {}
+    
+    # Filter to keep only existing columns
+    existing_keep_cols = [col for col in keep_cols if col in df.columns]
+    df = df[existing_keep_cols]
+    
+    st.write(f"   📋 Kept columns: {existing_keep_cols}")
     
     st.write(f"   ✂️ Kept only {len(keep_cols)} fundamental columns")
     
@@ -143,81 +156,148 @@ def create_ultra_cleaned_dataset(save_to_disk=True):
     
     engineered_features = []
     
-    # Historical team success (lagged features)
-    if 'yearID' in df.columns and 'teamID' in df.columns:
-        # Previous year division win (weak predictor due to roster changes)
-        df_sorted = df.sort_values(['teamID', 'yearID'])
-        df['prev_year_divwin'] = df_sorted.groupby('teamID')['division_winner'].shift(1)
-        df['prev_year_divwin'] = df['prev_year_divwin'].fillna(0)
-        engineered_features.append('prev_year_divwin')
-        
-        # Team "momentum" - won division in last 2 years
-        df['prev_2yr_divwin'] = df_sorted.groupby('teamID')['division_winner'].rolling(3, min_periods=1).sum().shift(1)
-        df['prev_2yr_divwin'] = df['prev_2yr_divwin'].fillna(0)
-        engineered_features.append('prev_2yr_divwin')
+    # Historical team success (lagged features) - ONLY if we have the required columns
+    if 'yearID' in df.columns and 'teamID' in df.columns and len(df) > 0:
+        try:
+            # Previous year division win (weak predictor due to roster changes)
+            df_sorted = df.sort_values(['teamID', 'yearID'])
+            df['prev_year_divwin'] = df_sorted.groupby('teamID')['division_winner'].shift(1)
+            df['prev_year_divwin'] = df['prev_year_divwin'].fillna(0)
+            engineered_features.append('prev_year_divwin')
+            
+            # Team "momentum" - won division in last 2 years
+            df['prev_2yr_divwin'] = df_sorted.groupby('teamID')['division_winner'].rolling(3, min_periods=1).sum().shift(1)
+            df['prev_2yr_divwin'] = df['prev_2yr_divwin'].fillna(0)
+            engineered_features.append('prev_2yr_divwin')
+            
+            st.write(f"   ✅ Created historical features: prev_year_divwin, prev_2yr_divwin")
+        except Exception as e:
+            st.warning(f"   ⚠️ Could not create historical features: {e}")
+    else:
+        st.warning("   ⚠️ Missing teamID or yearID - skipping historical features")
     
     # League/Division difficulty (contextual factors)
     if 'lgID' in df.columns:
-        # American vs National League (minimal predictor)
-        df['is_american_league'] = (df['lgID'] == 'AL').astype(int)
-        engineered_features.append('is_american_league')
+        try:
+            # American vs National League (minimal predictor)
+            df['is_american_league'] = (df['lgID'] == 'AL').astype(int)
+            engineered_features.append('is_american_league')
+            st.write(f"   ✅ Created league feature: is_american_league")
+        except Exception as e:
+            st.warning(f"   ⚠️ Could not create league feature: {e}")
     
     # Year effects (era-based factors)
     if 'yearID' in df.columns:
-        # Decade effects (rule changes, expansion, etc.)
-        df['decade'] = (df['yearID'] // 10) * 10
-        df['is_expansion_era'] = ((df['yearID'] >= 1960) & (df['yearID'] <= 1980)).astype(int)
-        df['is_steroid_era'] = ((df['yearID'] >= 1990) & (df['yearID'] <= 2005)).astype(int)
-        df['is_modern_era'] = (df['yearID'] >= 2006).astype(int)
-        
-        engineered_features.extend(['is_expansion_era', 'is_steroid_era', 'is_modern_era'])
+        try:
+            # Decade effects (rule changes, expansion, etc.)
+            df['decade'] = (df['yearID'] // 10) * 10
+            df['is_expansion_era'] = ((df['yearID'] >= 1960) & (df['yearID'] <= 1980)).astype(int)
+            df['is_steroid_era'] = ((df['yearID'] >= 1990) & (df['yearID'] <= 2005)).astype(int)
+            df['is_modern_era'] = (df['yearID'] >= 2006).astype(int)
+            
+            engineered_features.extend(['is_expansion_era', 'is_steroid_era', 'is_modern_era'])
+            st.write(f"   ✅ Created era features: expansion_era, steroid_era, modern_era")
+        except Exception as e:
+            st.warning(f"   ⚠️ Could not create era features: {e}")
     
     # Team "stability" proxies (very weak predictors)
     if 'franchID' in df.columns:
-        # Franchise age (older franchises might have more resources)
-        franchise_first_year = df.groupby('franchID')['yearID'].transform('min')
-        df['franchise_age'] = df['yearID'] - franchise_first_year
-        df['franchise_age'] = df['franchise_age'].fillna(0)
-        engineered_features.append('franchise_age')
+        try:
+            # Franchise age (older franchises might have more resources)
+            franchise_first_year = df.groupby('franchID')['yearID'].transform('min')
+            df['franchise_age'] = df['yearID'] - franchise_first_year
+            df['franchise_age'] = df['franchise_age'].fillna(0)
+            engineered_features.append('franchise_age')
+            st.write(f"   ✅ Created franchise feature: franchise_age")
+        except Exception as e:
+            st.warning(f"   ⚠️ Could not create franchise feature: {e}")
     
-    # Random noise features to simulate uncertainty
-    np.random.seed(42)  # Reproducible
-    df['market_size_proxy'] = np.random.normal(0, 1, len(df))  # Simulates unknown market factors
-    df['payroll_proxy'] = np.random.normal(0, 1, len(df))     # Simulates unknown payroll effects
-    df['chemistry_proxy'] = np.random.normal(0, 1, len(df))   # Simulates team chemistry/luck
-    
-    engineered_features.extend(['market_size_proxy', 'payroll_proxy', 'chemistry_proxy'])
+    # Random noise features to simulate uncertainty (always works)
+    try:
+        np.random.seed(42)  # Reproducible
+        df['market_size_proxy'] = np.random.normal(0, 1, len(df))  # Simulates unknown market factors
+        df['payroll_proxy'] = np.random.normal(0, 1, len(df))     # Simulates unknown payroll effects
+        df['chemistry_proxy'] = np.random.normal(0, 1, len(df))   # Simulates team chemistry/luck
+        
+        engineered_features.extend(['market_size_proxy', 'payroll_proxy', 'chemistry_proxy'])
+        st.write(f"   ✅ Created noise features: market_size_proxy, payroll_proxy, chemistry_proxy")
+    except Exception as e:
+        st.error(f"   ❌ Could not create noise features: {e}")
+        # If we can't even create random features, something is very wrong
+        return pd.DataFrame(), {}
     
     st.write(f"   🔧 Created {len(engineered_features)} WEAK predictive features")
     
     # STEP 5: Final data preparation
     st.write("🧹 **Final preparation**")
     
-    # Remove ID columns except what we need for modeling
-    id_cols = ['teamID', 'yearID', 'lgID', 'franchID', 'divID', 'name', 'park', 'DivWin', 'decade']
-    feature_cols = [col for col in engineered_features if col in df.columns]
+    # Get only the features that were actually created successfully
+    actual_feature_cols = []
+    for col in engineered_features:
+        if col in df.columns:
+            actual_feature_cols.append(col)
     
-    # Keep only target and engineered features
-    final_cols = ['yearID', 'teamID', 'division_winner'] + feature_cols
-    df_final = df[final_cols].copy()
+    # Minimum fallback - if we have no engineered features, create basic ones
+    if len(actual_feature_cols) == 0:
+        st.warning("⚠️ No engineered features created - creating minimal fallback features")
+        
+        # Create very basic features as fallback
+        df['constant_feature'] = 1  # Baseline
+        df['random_feature'] = np.random.normal(0, 1, len(df))
+        
+        if 'yearID' in df.columns:
+            df['year_normalized'] = (df['yearID'] - df['yearID'].min()) / (df['yearID'].max() - df['yearID'].min() + 1)
+            actual_feature_cols.extend(['constant_feature', 'random_feature', 'year_normalized'])
+        else:
+            actual_feature_cols.extend(['constant_feature', 'random_feature'])
     
-    # Handle missing values
-    for col in feature_cols:
+    # Keep only essential columns for modeling
+    essential_cols = []
+    
+    # Always include target
+    if 'division_winner' in df.columns:
+        essential_cols.append('division_winner')
+    
+    # Include year and team ID if available (for splits)
+    for col in ['yearID', 'teamID']:
+        if col in df.columns:
+            essential_cols.append(col)
+    
+    # Include actual features
+    essential_cols.extend(actual_feature_cols)
+    
+    # Create final dataframe with only essential columns
+    df_final = df[essential_cols].copy()
+    
+    # Handle missing values in features
+    for col in actual_feature_cols:
         if df_final[col].isnull().any():
-            df_final[col] = df_final[col].fillna(df_final[col].median())
+            fill_value = df_final[col].median() if df_final[col].dtype in ['int64', 'float64'] else 0
+            df_final[col] = df_final[col].fillna(fill_value)
     
-    # Remove duplicates
-    df_final = df_final.drop_duplicates(subset=['teamID', 'yearID'])
+    # Remove duplicates if we have teamID and yearID
+    if 'teamID' in df_final.columns and 'yearID' in df_final.columns:
+        df_final = df_final.drop_duplicates(subset=['teamID', 'yearID'])
+    
+    # Final validation
+    if df_final.empty:
+        st.error("❌ Final dataset is empty!")
+        return pd.DataFrame(), {}
+    
+    if 'division_winner' not in df_final.columns:
+        st.error("❌ Target variable 'division_winner' missing!")
+        return pd.DataFrame(), {}
     
     cleaning_log.update({
         "banned_columns_removed": removed_count,
-        "final_features": feature_cols,
+        "final_features": actual_feature_cols,
         "final_shape": df_final.shape,
         "expected_accuracy": "60-75% (realistic for sports prediction)"
     })
     
     st.write(f"✅ **ULTRA-CLEAN dataset ready: {df_final.shape}**")
-    st.write(f"📊 **Features: {len(feature_cols)} WEAK predictors only**")
+    st.write(f"📊 **Features: {len(actual_feature_cols)} predictors**")
+    st.write(f"📋 **Feature list: {', '.join(actual_feature_cols)}**")
     st.write(f"🎯 **Expected accuracy: 60-75% (realistic for sports)**")
     
     # Save if requested
