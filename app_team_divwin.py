@@ -61,11 +61,9 @@ def build_team_divwin_dataset():
                "teamIDBR","teamIDlahman45","teamIDretro",
                "teamID","lgID","franchID","divID"}
     num_cols = [c for c in df.columns if c not in exclude and pd.api.types.is_numeric_dtype(df[c])]
-    X = df[num_cols].copy()
-    y = df["label"].copy()
-
-    out = pd.concat([df[["yearID"]], X, y], axis=1)
-    return out, num_cols
+    
+    # Return the original df with the label column added, not a concatenated version
+    return df, num_cols
 
 # ----------------------------
 # Task implementation
@@ -80,8 +78,12 @@ def task_team_divwin():
     model_choice = st.selectbox("Choose model", ["Gradient Boosting","Random Forest"])
     test_size = st.slider("Test size", min_value=0.1, max_value=0.4, value=0.2, step=0.05)
 
+    # Work directly with the feature columns and label from df
+    # Don't use the concatenated output from build_team_divwin_dataset
+    feature_cols = [c for c in feat_cols if c in df.columns]
+    
     # Clean features and labels together to maintain alignment
-    X_df = df[feat_cols].copy()
+    X_df = df[feature_cols].copy()
     y_series = df["label"].copy()
     
     # Apply cleaning to features
@@ -89,10 +91,10 @@ def task_team_divwin():
     X_df = X_df.replace([np.inf, -np.inf], np.nan)
     X_df = X_df.fillna(0)
     
-    # Check for any rows that might have been problematic and remove them from both X and y
-    valid_rows = ~(X_df.isna().all(axis=1))  # Keep rows that aren't entirely NaN
-    X_clean = X_df[valid_rows]
-    y_clean = y_series[valid_rows]
+    # Ensure X and y have the same index
+    common_idx = X_df.index.intersection(y_series.index)
+    X_clean = X_df.loc[common_idx]
+    y_clean = y_series.loc[common_idx]
     
     # Convert to numpy arrays
     X = X_clean.values
