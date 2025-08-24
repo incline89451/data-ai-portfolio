@@ -59,6 +59,7 @@ def create_ultra_cleaned_dataset(save_to_disk=True):
     
     st.write(f"📊 Original data shape: {df.shape}")
     
+    
     # STEP 1: NUCLEAR OPTION - Remove ALL season totals and counting stats
     st.write("☢️ **NUCLEAR LEAKAGE REMOVAL**")
     
@@ -91,17 +92,18 @@ def create_ultra_cleaned_dataset(save_to_disk=True):
         'rank', 'finish', 'place'
     ]
     
-    # Remove banned columns
+    # Remove banned columns that actually exist
     removed_count = 0
     for col in absolutely_banned:
         if col in df.columns:
             df = df.drop(columns=[col])
             removed_count += 1
     
-    st.write(f"   💥 NUKED {removed_count} high-correlation columns")
+    st.write(f"   💥 REMOVED {removed_count} high-correlation columns")
+    st.write(f"   📊 Remaining columns after nuclear removal: {len(df.columns)}")
     
-    # STEP 2: Only keep fundamental team characteristics (not performance)
-    st.write("🧬 **Keeping only DNA-level team characteristics**")
+    # STEP 2: Keep only fundamental team characteristics
+    st.write("🧬 **Keeping only fundamental characteristics**")
     
     # What we CAN keep - things that don't directly measure performance
     allowed_features = {
@@ -111,49 +113,39 @@ def create_ultra_cleaned_dataset(save_to_disk=True):
         # Historical/contextual (but will limit usage)
         'Ghome',  # Home games scheduled
         
-        # We'll create our OWN features that simulate pre-season knowledge
+        # Target variable
+        'division_winner'
     }
     
-    # Keep only allowed columns plus target - SAFELY check what exists
-    keep_cols = ['DivWin']  # Always keep target
+    # Keep only allowed columns that actually exist
+    keep_cols = []
     for col in df.columns:
         if col in allowed_features:
             keep_cols.append(col)
     
-    # Safety check - make sure we have at least the target
-    if 'DivWin' not in df.columns:
-        st.error("❌ DivWin column not found in dataset!")
-        return pd.DataFrame(), {}
+    # Always keep the target if it exists
+    if 'division_winner' not in keep_cols and 'division_winner' in df.columns:
+        keep_cols.append('division_winner')
     
     # Filter to keep only existing columns
-    existing_keep_cols = [col for col in keep_cols if col in df.columns]
-    df = df[existing_keep_cols]
+    df = df[keep_cols]
     
-    st.write(f"   📋 Kept columns: {existing_keep_cols}")
+    st.write(f"   📋 Kept columns: {keep_cols}")
+    st.write(f"   📊 Dataset shape after filtering: {df.shape}")
     
-    st.write(f"   ✂️ Kept only {len(keep_cols)} fundamental columns")
-    
-    # STEP 3: Create target variable
-    st.write("🎯 **Creating target variable**")
-    if 'DivWin' not in df.columns:
-        st.error("❌ DivWin column not found")
+    # Verify target exists
+    if 'division_winner' not in df.columns:
+        st.error("❌ Target variable lost during filtering!")
         return pd.DataFrame(), {}
     
-    # Clean target variable
-    df = df.dropna(subset=['DivWin'])
-    df['division_winner'] = (df['DivWin'].astype(str).str.upper() == 'Y').astype(int)
-    
+    # Check data quality
     winners = df['division_winner'].sum()
     total = len(df)
     win_rate = (winners / total) * 100
     st.write(f"   🏆 Division winners: {winners}/{total} ({win_rate:.1f}%)")
     
-    # STEP 4: Create WEAK predictors only (simulate pre-season analysis)
+    # Continue with feature engineering...
     st.write("🔮 **Creating PRE-SEASON prediction features**")
-    
-    # The key insight: Use only information available BEFORE the season
-    # or very early in the season
-    
     engineered_features = []
     
     # Historical team success (lagged features) - ONLY if we have the required columns
@@ -329,52 +321,108 @@ def run_realistic_division_prediction():
     st.subheader("🚨 ULTRA-REALISTIC Baseball Division Prediction")
     st.warning("⚠️ This version removes ALL performance statistics to achieve realistic accuracy!")
     
-    # Data options
-    data_option = st.radio(
-        "Data processing:",
-        ["Use ultra-cleaned data", "Re-clean with nuclear option", "Compare with original"]
-    )
+    # FIRST: Always inspect the original data
+    st.subheader("🔍 Dataset Inspection")
+    df_original = load_original_teams_data()
+    if df_original.empty:
+        return
     
-    if data_option == "Compare with original":
-        st.subheader("📊 Before/After Comparison")
-        df_original = load_original_teams_data()
-        if not df_original.empty:
-            col1, col2 = st.columns(2)
-            with col1:
-                st.write("**Original Data**")
-                st.write(f"Shape: {df_original.shape}")
-                st.write(f"Columns: {list(df_original.columns[:10])}...")
+    st.write(f"**📊 Dataset Shape:** {df_original.shape}")
+    st.write(f"**📋 All Columns ({len(df_original.columns)}):**")
+    st.write(list(df_original.columns))
+    
+    # Show sample data
+    st.write("**📄 Sample Data (first 5 rows):**")
+    st.dataframe(df_original.head())
+    
+    # Look for possible target columns
+    possible_targets = []
+    for col in df_original.columns:
+        col_lower = col.lower()
+        if any(word in col_lower for word in ['win', 'division', 'champ', 'playoff', 'title']):
+            possible_targets.append(col)
+    
+    if possible_targets:
+        st.write(f"**🎯 Possible Target Columns Found:** {possible_targets}")
+        
+        # Let user choose target
+        target_col = st.selectbox("Choose target column for division winners:", possible_targets)
+        
+        if st.button("Proceed with Analysis"):
+            # Create modified dataset with chosen target
+            df_modified = df_original.copy()
             
-            df_clean = load_ultra_cleaned_data()
-            with col2:
-                st.write("**Ultra-Cleaned Data**")
-                st.write(f"Shape: {df_clean.shape}")
-                st.write(f"Columns: {list(df_clean.columns)}")
-        return
-    
-    # Load data
-    if data_option == "Re-clean with nuclear option":
-        df_clean, cleaning_log = create_ultra_cleaned_dataset(save_to_disk=True)
+            # Inspect the chosen target column
+            st.write(f"**🔍 Target Column '{target_col}' Analysis:**")
+            st.write(f"   Data type: {df_modified[target_col].dtype}")
+            st.write(f"   Unique values: {sorted(df_modified[target_col].unique())}")
+            st.write(f"   Value counts:")
+            st.dataframe(df_modified[target_col].value_counts())
+            
+            # Convert target to binary (try different approaches)
+            try:
+                if df_modified[target_col].dtype == 'object' or df_modified[target_col].dtype.name == 'string':
+                    # String target - look for Y/N, Yes/No, Win/Loss, etc.
+                    unique_vals = df_modified[target_col].str.upper().unique()
+                    st.write(f"   String values found: {unique_vals}")
+                    
+                    if 'Y' in unique_vals:
+                        df_modified['division_winner'] = (df_modified[target_col].str.upper() == 'Y').astype(int)
+                    elif 'YES' in unique_vals:
+                        df_modified['division_winner'] = (df_modified[target_col].str.upper() == 'YES').astype(int)
+                    elif 'WIN' in unique_vals:
+                        df_modified['division_winner'] = (df_modified[target_col].str.upper() == 'WIN').astype(int)
+                    else:
+                        st.error(f"❌ Cannot interpret target values: {unique_vals}")
+                        return
+                        
+                elif pd.api.types.is_numeric_dtype(df_modified[target_col]):
+                    # Numeric target - assume 1 = winner, 0 = not winner
+                    df_modified['division_winner'] = (df_modified[target_col] == 1).astype(int)
+                    
+                else:
+                    st.error(f"❌ Unknown target column type: {df_modified[target_col].dtype}")
+                    return
+                
+                # Check if we successfully created binary target
+                winners = df_modified['division_winner'].sum()
+                total = len(df_modified)
+                win_rate = (winners / total) * 100
+                
+                st.success(f"✅ **Target Created Successfully!**")
+                st.write(f"   🏆 Winners: {winners}/{total} ({win_rate:.1f}%)")
+                
+                # Now proceed with the ultra-aggressive cleaning using the modified dataset
+                st.write("---")
+                run_ultra_aggressive_prediction(df_modified)
+                
+            except Exception as e:
+                st.error(f"❌ Error processing target column: {e}")
+                st.write("Please check the target column format")
+                
     else:
-        df_clean = load_ultra_cleaned_data()
+        st.error("❌ **No suitable target columns found!**")
+        st.write("""
+        **Looking for columns containing:** 'win', 'division', 'champ', 'playoff', 'title'
+        
+        **Options:**
+        1. Your dataset might use different naming
+        2. You might need to create a target variable manually
+        3. This might not be the right dataset for division prediction
+        """)
+        
+        # Show all columns for manual inspection
+        with st.expander("🔍 Inspect All Columns"):
+            for col in df_original.columns:
+                st.write(f"**{col}:** {df_original[col].dtype} - Sample: {df_original[col].dropna().iloc[0] if not df_original[col].dropna().empty else 'No data'}")
+
+def run_ultra_aggressive_prediction(df_with_target):
+    """Run the actual prediction with a dataset that has a proper target"""
     
-    if df_clean.empty:
-        st.error("No data available")
-        return
+    st.subheader("⚡ Ultra-Aggressive Prediction Pipeline")
     
-    st.write(f"📊 **Ultra-cleaned data shape:** {df_clean.shape}")
-    
-    # Get features (exclude IDs and target)
-    exclude_cols = {'teamID', 'yearID', 'division_winner'}
-    feature_cols = [col for col in df_clean.columns 
-                   if col not in exclude_cols and pd.api.types.is_numeric_dtype(df_clean[col])]
-    
-    st.write(f"🎯 **Available features:** {len(feature_cols)}")
-    st.write(f"📋 **Features:** {', '.join(feature_cols)}")
-    
-    if len(feature_cols) < 2:
-        st.error("❌ Too few features! Need at least 2 for modeling.")
-        return
+    # Now we have df_with_target which includes 'division_winner'
+    df = df_with_target.copy()
     
     # Prepare data
     X = df_clean[feature_cols].copy()
