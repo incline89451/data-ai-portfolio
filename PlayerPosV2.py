@@ -1,85 +1,84 @@
-
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import joblib
-import io
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_auc_score
 
-st.title("Baseball Player Position Classifier")
-
-# Load data
+# === Load Data ===
 @st.cache_data
 def load_data():
-    people = pd.read_parquet("data/People.parquet")
-    batting = pd.read_parquet("data/Batting.parquet")
-    pitching = pd.read_parquet("data/Pitching.parquet")
-    hof = pd.read_parquet("data/HallOfFame.parquet")
-    return people, batting, pitching, hof
+    try:
+        df = pd.read_parquet("data/People.parquet")
+    except Exception as e:
+        st.error(f"❌ Could not load People.parquet: {e}")
+        return None
+    return df
 
-people, batting, pitching, hof = load_data()
+df = load_data()
 
-# --- Feature engineering (simplified example) ---
-def derive_features(people, batting, pitching):
-    bat_agg = batting.groupby("playerID").agg({"HR":"sum","RBI":"sum","AB":"sum"}).reset_index()
-    pit_agg = pitching.groupby("playerID").agg({"SO":"sum","ERA":"mean"}).reset_index()
-    feats = people.merge(bat_agg, on="playerID", how="left").merge(pit_agg, on="playerID", how="left")
-    feats = feats.fillna(0)
-    return feats
+if df is None:
+    st.stop()
 
-features = derive_features(people, batting, pitching)
+st.title("⚾ Player Position Classifier")
+st.write("Train a model to predict a player's position based on available data.")
 
-# Create label (dummy example: position as label)
-labels = people[["playerID","primaryPos"]] if "primaryPos" in people.columns else None
+# === Detect Label Column ===
+possible_labels = ["primaryPos", "pos", "position", "playerPos"]
+label_col = None
+for col in possible_labels:
+    if col in df.columns:
+        label_col = col
+        break
 
-if labels is not None:
-    data = features.merge(labels, on="playerID")
-    X = data.drop(columns=["playerID","primaryPos"])
-    y = data["primaryPos"]
-
-    # Train/test split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Train model
-    clf = RandomForestClassifier(n_estimators=100, random_state=42)
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-
-    # Accuracy
-    accuracy = accuracy_score(y_test, y_pred)
-    st.write(f"### Overall Accuracy: {accuracy:.3f}")
-
-    # --- Diagnostics ---
-    # Class distribution
-    st.write("### Class Distribution (Training Data)")
-    class_counts = y.value_counts(normalize=True).sort_index()
-    st.bar_chart(class_counts)
-
-    # Classification Report
-    st.write("### Per-Class Performance (Test Data)")
-    report = classification_report(y_test, y_pred, output_dict=True)
-    report_df = pd.DataFrame(report).transpose()
-    st.dataframe(report_df.style.background_gradient(cmap="Blues"))
-
-    # Confusion Matrix
-    st.write("### Confusion Matrix")
-    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
-    fig, ax = plt.subplots(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=clf.classes_, yticklabels=clf.classes_, ax=ax)
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    st.pyplot(fig)
-
-    # Download trained model
-    st.write("### Download trained model (optional)")
-    buffer = io.BytesIO()
-    joblib.dump(clf, buffer)
-    buffer.seek(0)
-    st.download_button("Download Model", buffer, file_name="player_position_model.pkl")
-
+if not label_col:
+    st.error(f"❌ No label column found. Expected one of {possible_labels}, but got: {list(df.columns)}")
+    st.stop()
 else:
-    st.error("No label column 'primaryPos' found in People.parquet.")
+    st.success(f"✅ Using **{label_col}** as the label column.")
+
+# === Prepare Features & Labels ===
+X = df.drop(columns=[label_col], errors="ignore").select_dtypes(include=["number"]).fillna(0)
+y = df[label_col]
+
+if X.empty:
+    st.error("❌ No numeric features found in dataset for training.")
+    st.stop()
+
+# === Train/Test Split ===
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# === Train Model ===
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# === Predictions & Metrics ===
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+st.subheader("📊 Model Performance")
+st.write(f"**Overall Accuracy:** {accuracy:.3f}")
+
+# Confusion Matrix
+fig, ax = plt.subplots(figsize=(8, 5))
+sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt="d", cmap="Blues", ax=ax)
+ax.set_title("Confusion Matrix")
+st.pyplot(fig)
+
+# Classification Report
+st.text("Classification Report:")
+st.text(classification_report(y_test, y_pred))
+
+# ROC AUC (only if binary classification)
+if len(y.unique()) == 2:
+    y_pred_proba = model.predict_proba(X_test)[:, 1]
+    roc_auc = roc_auc_score(y_test, y_pred_proba)
+    st.write(f"**ROC AUC Score:** {roc_auc:.3f}")
+
+# === Model Download ===
+st.subheader("💾 Download Trained Model")
+joblib.dump(model, "rf_model.pkl")
+with open("rf_model.pkl", "rb") as f:
+    st.download_button("Download Model", f, file_name="rf_model.pkl")
