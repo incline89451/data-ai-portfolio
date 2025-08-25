@@ -6,3 +6,4 @@ pyarrow
 plotly
 matplotlib
 seaborn
+joblib
