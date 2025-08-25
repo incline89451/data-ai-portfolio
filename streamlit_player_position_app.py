@@ -14,6 +14,7 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 import matplotlib.pyplot as plt
 import seaborn as sns
+from io import BytesIO
 
 # ------------ Configuration ------------
 DATA_DIR = "data"
@@ -80,13 +81,8 @@ def build_dataset(tables: Dict[str, pd.DataFrame]) -> Tuple[pd.DataFrame, pd.Ser
 
     fld = tables["fielding"].copy()
     fld_numeric = fld[["playerID", "G", "GS", "InnOuts", "PO", "A", "E", "DP"]].copy()
-    fld_numeric["G"] = pd.to_numeric(fld_numeric["G"], errors="coerce")
-    fld_numeric["GS"] = pd.to_numeric(fld_numeric["GS"], errors="coerce")
-    fld_numeric["InnOuts"] = pd.to_numeric(fld_numeric["InnOuts"], errors="coerce")
-    fld_numeric["PO"] = pd.to_numeric(fld_numeric["PO"], errors="coerce")
-    fld_numeric["A"] = pd.to_numeric(fld_numeric["A"], errors="coerce")
-    fld_numeric["E"] = pd.to_numeric(fld_numeric["E"], errors="coerce")
-    fld_numeric["DP"] = pd.to_numeric(fld_numeric["DP"], errors="coerce")
+    for col in ["G", "GS", "InnOuts", "PO", "A", "E", "DP"]:
+        fld_numeric[col] = pd.to_numeric(fld_numeric[col], errors="coerce")
 
     fld_agg = (
         fld_numeric.groupby("playerID", as_index=False)
@@ -213,6 +209,8 @@ with col2:
 
 st.divider()
 st.subheader("Download trained model (optional)")
-model_bytes = joblib.dumps(model)
-st.download_button("Download model.pkl", data=model_bytes, file_name="position_model.pkl")
+buffer = BytesIO()
+joblib.dump(model, buffer)
+buffer.seek(0)
+st.download_button("Download model.pkl", data=buffer, file_name="position_model.pkl")
 st.caption("Data schemas follow the Lahman Baseball Database (People, Appearances, Fielding tables).")
