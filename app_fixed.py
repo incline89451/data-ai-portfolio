@@ -19,7 +19,7 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree
 import matplotlib.pyplot as plt
 
 # ------------ Configuration ------------
-DATA_DIR = os.environ.get("DATA_PATH", "/user/todd/projects/Project89521/data")
+DATA_DIR = os.environ.get("DATA_PATH", "/data")
 
 # Candidate parquet filenames per table (case-insensitive)
 PARQUET_NAMES = {
