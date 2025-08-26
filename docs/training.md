@@ -1,6 +1,7 @@
 ---
+layout: agency
 title: Training
-layout: agency  # matches the layout file in _layouts
+permalink: /training/
 ---
 
 ## Training & Readiness
