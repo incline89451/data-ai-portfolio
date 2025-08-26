@@ -1,5 +1,5 @@
 ---
-title: Training & Readiness
+title: Home
 layout: agency  # matches the layout file in _layouts
 ---
 
