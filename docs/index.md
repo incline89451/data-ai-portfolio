@@ -1,9 +1,7 @@
 ---
-title: Home
-layout: page
+title: Training & Readiness
+layout: agency  # matches the layout file in _layouts
 ---
-
-
 
 [ Home](index.md) | [ Projects](projects.md) | [ About](about.md) | [ Training](training.md) | [ Contact](index.md#-get-in-touch)
 
