@@ -1,7 +1,9 @@
 ---
-title: Projects
-layout: agency  # matches the layout file in _layouts
+layout: agency
+title: Training
+permalink: /projects/
 ---
+
 
 
 [🏠 Home](index.md) | [📂 Projects](projects.md) | [👤 About](about.md) | [✍️ Blog](blog.md) | [📬 Contact](index.md#-get-in-touch)
