@@ -1,5 +1,5 @@
 ---
-layout: agency
+layout: default
 title: Training
 permalink: /projects/
 ---
