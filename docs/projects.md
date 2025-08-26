@@ -1,3 +1,8 @@
+---
+title: Projects
+layout: page
+---
+
 [🏠 Home](index.md) | [📂 Projects](projects.md) | [👤 About](about.md) | [✍️ Blog](blog.md) | [📬 Contact](index.md#-get-in-touch)
 
 
