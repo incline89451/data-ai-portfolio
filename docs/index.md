@@ -1,3 +1,10 @@
+---
+title: Home
+layout: page
+---
+
+
+
 [ Home](index.md) | [ Projects](projects.md) | [ About](about.md) | [ Training](training.md) | [ Contact](index.md#-get-in-touch)
 
 
