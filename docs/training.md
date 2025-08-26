@@ -1,6 +1,6 @@
 ---
-title: Training & Readiness
-layout: page
+title: Training
+layout: agency  # matches the layout file in _layouts
 ---
 
 ## Training & Readiness
