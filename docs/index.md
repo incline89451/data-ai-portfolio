@@ -1,4 +1,4 @@
-[🏠 Home](index.md) | [📂 Projects](projects.md) | [👤 About](about.md) | [✍️ Blog](blog.md) | [📬 Contact](index.md#-get-in-touch)
+[ Home](index.md) | [ Projects](projects.md) | [ About](about.md) | [ Blog](blog.md) | [ Contact](index.md#-get-in-touch)
 
 
 Welcome to my portfolio!  
@@ -29,7 +29,7 @@ Prototype SaaS app that tracks **LLM performance, drift, and trust metrics**, de
 ---
 
 ## 📬 Get in Touch
-- 💼 [LinkedIn](https://www.linkedin.com/in/yourname)  
+- 💼 [LinkedIn](https://www.linkedin.com/in/tbailey)  
 - 🐙 [GitHub](https://github.com/yourusername)  
 - ✉️ [Email Me](mailto:your@email.com)
 
