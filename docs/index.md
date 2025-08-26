@@ -1,4 +1,4 @@
-[ Home](index.md) | [ Projects](projects.md) | [ About](about.md) | [ Blog](blog.md) | [ Contact](index.md#-get-in-touch)
+[ Home](index.md) | [ Projects](projects.md) | [ About](about.md) | [ Training](training.md) | [ Contact](index.md#-get-in-touch)
 
 
 Welcome to my portfolio!  
