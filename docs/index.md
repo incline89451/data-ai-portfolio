@@ -7,7 +7,7 @@ I focus on turning complex technology into **products that deliver trust, value,
 
 ---
 
-## 🚀 Featured Projects
+## Featured Projects
 
 ### 🔹 AI & Data Governance Roadmap
 [View Project →](../notebooks/ai-governance-roadmap.ipynb)  
@@ -21,17 +21,17 @@ Prototype SaaS app that tracks **LLM performance, drift, and trust metrics**, de
 
 ---
 
-## ✍️ Writing & Insights
+## Writing & Insights
 - [How AI Compliance Drives Revenue](blog/ai-compliance-business-value.md)  
 - [Lessons Learned from Building ML Models in scikit-learn](blog/lessons-ml-sklearn.md)  
 - [AI Readiness Assessment Framework](blog/ai-readiness-framework.md)
 
 ---
 
-## 📬 Get in Touch
-- 💼 [LinkedIn](https://www.linkedin.com/in/tbailey)  
-- 🐙 [GitHub](https://github.com/yourusername)  
-- ✉️ [Email Me](mailto:your@email.com)
+## Get in Touch
+-  [LinkedIn](https://www.linkedin.com/in/tbailey)  
+-  [GitHub](https://github.com/yourusername)  
+-  [Email Me](mailto:your@email.com)
 
 ---
 
