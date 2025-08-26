@@ -1,4 +1,5 @@
-# Todd Bailey
+[🏠 Home](index.md) | [📂 Projects](projects.md) | [👤 About](about.md) | [✍️ Blog](blog.md) | [📬 Contact](index.md#-get-in-touch)
+
 
 Welcome to my portfolio!  
 I’m a **Product + Data Leader** with 15+ years of experience building **AI, data, and SaaS platforms**.  
