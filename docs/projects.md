@@ -1,3 +1,7 @@
+[🏠 Home](index.md) | [📂 Projects](projects.md) | [👤 About](about.md) | [✍️ Blog](blog.md) | [📬 Contact](index.md#-get-in-touch)
+
+
+
 # 🚀 Projects Portfolio
 
 A collection of my projects across **AI, Data Engineering, SaaS, and Product Management**.  
